@@ -31,7 +31,7 @@ notarized.
       ```sh
       gh run download <run id> -R huynhtuanhuy/claude-multi-auth -n npm-package -D first-publish
       npm login
-      npm publish first-publish/claude-multi-auth-<v>.tgz --access public --provenance=false
+      npm publish ./first-publish/claude-multi-auth-<v>.tgz --access public --provenance=false
       ```
       Publish this tarball rather than one from a local
       `scripts/package-release.sh` run: its `checksums.json` holds the

@@ -281,4 +281,4 @@ jobs:
         run: |
           set -- --access public --provenance
           [ "$PRERELEASE" = true ] && set -- "$@" --tag next
-          npm publish "pkg/claude-multi-auth-$VERSION.tgz" "$@"
+          npm publish "./pkg/claude-multi-auth-$VERSION.tgz" "$@"
