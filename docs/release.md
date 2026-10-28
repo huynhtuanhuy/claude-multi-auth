@@ -46,9 +46,11 @@ notarized.
    - workflow filename: `release.yml`
    - environment: leave empty
 
-   From then on the workflow publishes with a short-lived OIDC token; there
-   is no `NPM_TOKEN` secret. Afterwards you can disallow token publishing in
-   the same settings page.
+   Leave *Allow `npm publish`* unchecked: the trusted publisher may only
+   **stage** a version (`npm stage publish`), and a maintainer approves it
+   with 2FA. The workflow uses a short-lived OIDC token; there is no
+   `NPM_TOKEN` secret. Afterwards you can disallow token publishing in the
+   same settings page.
 
 ## Cutting a release
 
@@ -94,8 +96,12 @@ notarized.
      (`gh attestation verify <file> -R huynhtuanhuy/claude-multi-auth`).
 4. **GitHub Release** with the CHANGELOG section as notes and the files
    attached.
-5. **npm publish** of the packed tarball, after the release exists, so the
-   installer can always download its app.
+5. **npm stage publish** of the packed tarball, after the release exists,
+   so the installer can always download its app. The version is not public
+   yet: approve it on npmjs.com (*Staged Packages* → *Approve*) or with
+   `npm stage list claude-multi-auth` then `npm stage approve <stage-id>`.
+   Both ask for 2FA. Check the staged tarball first if you like
+   (`npm stage download <stage-id>`).
 
 If a later job fails, fix the cause and use *Re-run failed jobs*. A release
 that was already created makes the release job fail on re-run; delete the

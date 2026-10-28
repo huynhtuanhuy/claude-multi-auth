@@ -246,7 +246,7 @@ jobs:
           gh release create "$TAG" "$@" assets/*
 
   npm:
-    name: Publish to npm
+    name: Stage on npm
     # After the release, so the installer's app download exists the moment
     # the package does.
     needs: [prepare, release]
@@ -264,9 +264,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           package-manager-cache: false
 
-      - name: npm with trusted publishing support
+      - name: npm with staged publishing support
         run: |
-          npm install -g "npm@^11.5.1"
+          npm install -g "npm@^11.19.1"
           npm --version
 
       - uses: actions/download-artifact@v8
@@ -274,11 +274,15 @@ jobs:
           name: npm-package
           path: pkg
 
-      - name: Publish
+      # Staged, not published: the version stays private on the registry
+      # until a maintainer approves it with 2FA (npmjs.com → Staged Packages,
+      # or `npm stage approve <id>`), so a compromised workflow alone cannot
+      # ship a release.
+      - name: Stage for publishing
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
           PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
         run: |
           set -- --access public --provenance
           [ "$PRERELEASE" = true ] && set -- "$@" --tag next
-          npm publish "./pkg/claude-multi-auth-$VERSION.tgz" "$@"
+          npm stage publish "./pkg/claude-multi-auth-$VERSION.tgz" "$@"

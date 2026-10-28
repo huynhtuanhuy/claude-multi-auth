@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-10-28
+
+### Changed
+
+- npm releases are staged by CI and published only after a maintainer
+  approves them with 2FA. 0.1.1 was released on GitHub but not on npm.
+
 ## [0.1.1] - 2026-10-28
 
 ### Fixed
