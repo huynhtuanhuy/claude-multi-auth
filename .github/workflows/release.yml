@@ -1,0 +1,284 @@
+name: Release
+
+# A pushed `vX.Y.Z` tag builds the universal (Apple silicon + Intel) cma and
+# menubar app, creates the GitHub Release and publishes the npm package.
+# Running it by hand (workflow_dispatch) is a dry run: it builds and uploads
+# the same files as workflow artifacts and publishes nothing.
+# Maintainer steps are in docs/release.md.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and upload artifacts only. Publishing runs only from a pushed v* tag."
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      publish: ${{ steps.version.outputs.publish }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          package-manager-cache: false
+
+      # Every version file must agree, and on a tag also with the tag.
+      - name: Check versions
+        id: version
+        env:
+          EVENT: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$EVENT" = push ] && [ "$REF_TYPE" = tag ]; then
+            version=$(node scripts/check-versions.mjs --tag "$REF_NAME")
+            publish=true
+          else
+            if [ "$DRY_RUN" != true ]; then
+              echo "::error::Publishing runs only from a pushed v* tag; a manual run is always a dry run."
+              exit 1
+            fi
+            version=$(node scripts/check-versions.mjs)
+            publish=false
+          fi
+          case $version in
+            *-*) prerelease=true ;;
+            *) prerelease=false ;;
+          esac
+          {
+            echo "version=$version"
+            echo "publish=$publish"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+          echo "version $version, publish $publish, prerelease $prerelease"
+
+      # Fail before building if the CHANGELOG has no dated section to use as
+      # the release notes.
+      - name: Check release notes
+        if: steps.version.outputs.publish == 'true'
+        run: node scripts/release-notes.mjs "${{ steps.version.outputs.version }}" > /dev/null
+
+  gate:
+    name: Verify main CI
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      # Only release a commit that CI on main has already checked: the
+      # latest completed ci.yml push run on main must be for this exact
+      # commit and must have succeeded.
+      - name: Latest main CI passed for this commit
+        if: needs.prepare.outputs.publish == 'true'
+        uses: actions/github-script@v9
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const sha = process.env.RELEASE_SHA;
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              owner,
+              repo,
+              workflow_id: "ci.yml",
+              branch: "main",
+              event: "push",
+              status: "completed",
+              per_page: 1,
+            });
+            const run = data.workflow_runs[0];
+            if (!run) {
+              core.setFailed("No completed CI run on main.");
+              return;
+            }
+            if (run.head_sha !== sha) {
+              core.setFailed(
+                `Latest completed CI on main is for ${run.head_sha}, but the tag points at ${sha}. ` +
+                  `Tag the commit CI checked last, or wait for CI on main. Run: ${run.html_url}`,
+              );
+              return;
+            }
+            if (run.conclusion !== "success") {
+              core.setFailed(`CI on main for ${sha} concluded '${run.conclusion}': ${run.html_url}`);
+              return;
+            }
+            core.info(`CI on main passed for ${sha}: ${run.html_url}`);
+
+      - name: Dry run
+        if: needs.prepare.outputs.publish != 'true'
+        run: echo "Dry run; the main CI check applies to tag releases only."
+
+  build:
+    name: Build universal macOS artifacts
+    needs: [prepare, gate]
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    env:
+      CARGO_TERM_COLOR: always
+      VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # The toolchain pinned in rust-toolchain.toml, plus both Apple targets.
+      # No build cache in release builds: every artifact comes from a clean
+      # build of the tagged sources.
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          package-manager-cache: false
+
+      - name: Install frontend dependencies
+        run: npm --prefix app ci
+
+      - name: Installer tests
+        run: npm --prefix npm test
+
+      # beforeBuildCommand builds the webview and, through
+      # app/scripts/build-sidecar.sh, the universal cma sidecar.
+      - name: Build universal app
+        run: npm --prefix app run bundle -- --target universal-apple-darwin
+
+      # Checks archs, signatures and versions, then writes dist/release
+      # (zip, dmg, tarball, SHA256SUMS) and dist/npm (the packed npm package).
+      - name: Package
+        run: |
+          sh scripts/package-release.sh \
+            "target/universal-apple-darwin/release/bundle/macos/Claude Multi Auth.app" \
+            app/src-tauri/binaries/cma-universal-apple-darwin \
+            dist
+          tar -tzvf "dist/npm/claude-multi-auth-$VERSION.tgz"
+
+      - name: Release notes
+        env:
+          PUBLISH: ${{ needs.prepare.outputs.publish }}
+        run: |
+          if [ "$PUBLISH" = true ]; then
+            node scripts/release-notes.mjs "$VERSION" > dist/release-notes.md
+          else
+            node scripts/release-notes.mjs "$VERSION" --allow-unreleased > dist/release-notes.md
+          fi
+
+      # Build provenance for every published file. Only on real releases:
+      # attestations need the repository to be public.
+      - name: Attest build provenance
+        if: needs.prepare.outputs.publish == 'true'
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            dist/release/Claude-Multi-Auth_*
+            dist/release/cma-*.tar.gz
+            dist/npm/claude-multi-auth-*.tgz
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-assets
+          path: dist/release/
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: npm-package
+          path: dist/npm/claude-multi-auth-*.tgz
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-notes
+          path: dist/release-notes.md
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: [prepare, build]
+    if: needs.prepare.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-assets
+          path: assets
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-notes
+          path: notes
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+        run: |
+          set -- --verify-tag --title "v$VERSION" --notes-file notes/release-notes.md
+          [ "$PRERELEASE" = true ] && set -- "$@" --prerelease
+          gh release create "$TAG" "$@" assets/*
+
+  npm:
+    name: Publish to npm
+    # After the release, so the installer's app download exists the moment
+    # the package does.
+    needs: [prepare, release]
+    if: needs.prepare.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # registry-url makes npm exchange the OIDC token with the registry
+      # (trusted publishing); there is no NPM_TOKEN secret.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: npm with trusted publishing support
+        run: |
+          npm install -g "npm@^11.5.1"
+          npm --version
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-package
+          path: pkg
+
+      - name: Publish
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+        run: |
+          set -- --access public --provenance
+          [ "$PRERELEASE" = true ] && set -- "$@" --tag next
+          npm publish "pkg/claude-multi-auth-$VERSION.tgz" "$@"
