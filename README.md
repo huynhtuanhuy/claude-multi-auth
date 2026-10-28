@@ -8,7 +8,7 @@
 Switch Claude Code and Claude Desktop between several Claude accounts on one
 Mac, without logging out. Linux and Windows support is coming soon.
 
-<!-- demo: add docs/assets/demo.gif (menubar + `cma list`) -->
+![cma demo](docs/assets/demo.gif)
 
 Keep several Claude accounts logged in at once. If you use a work and a
 personal account, or several organizations, you no longer have to sign out,

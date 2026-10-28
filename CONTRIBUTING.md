@@ -76,6 +76,24 @@ How releases are built and published is in [docs/release.md](docs/release.md).
   [Uninstall](docs/install.md#uninstall) steps shows how to delete leftover test
   items.
 
+## Regenerating the demo
+
+The README demo is recorded with [VHS](https://github.com/charmbracelet/vhs)
+on the test backend, so it shows only dummy accounts. From the repository
+root:
+
+```sh
+vhs docs/assets/demo/demo.tape
+```
+
+The tape runs [`docs/assets/demo/seed.sh`](docs/assets/demo/seed.sh), which
+builds a debug `cma` with `test-backends` into `target/agent`, seeds a
+throwaway world under `$TMPDIR` and removes it when the recording ends (a
+failed recording leaves it behind as `$TMPDIR/cma-demo.*`; delete it by
+hand). It writes `docs/assets/demo.gif` and the still `docs/assets/demo.png`. To try
+the fake world by hand, run `eval "$(docs/assets/demo/seed.sh)"` in a new
+shell and `rm -rf "$CMA_DEMO_WORLD"` when done.
+
 ## Changes that need extra care
 
 - **Anything that writes a login** (Keychain items, `~/.claude.json`,
