@@ -23,6 +23,10 @@ inside.
 
 - Switch Claude Code, Claude Desktop, or both to another account without
   logging out and back in.
+- **Keep your Claude Desktop history across accounts.** Each account's
+  sidebar and local sessions are still there when you switch back, and with
+  *session follow* on, your local Code/Cowork sessions move with you to the
+  account you switch to, so you can keep working in them.
 - A menubar app that does everything through a menu, with launch at login.
 - Optional usage display: each account's 5-hour and 7-day windows, off
   until you ask for it.
@@ -30,11 +34,29 @@ inside.
   failure; `cma restore` undoes any single operation.
 - Aware of running `claude` sessions: asks before switching under them and
   keeps the tokens they refresh.
-- Session follow for Claude Desktop: move local Code/Cowork sessions to the
-  account you switch to.
 - `--json` on every command, with a documented contract for scripting.
 - Never prints tokens or writes them to plain files; credentials stay in
   the macOS Keychain.
+
+## Keep working when you switch accounts
+
+Hit the usage limit on one account in the middle of a task? Switch and carry on:
+
+- **Claude Code:** running `claude` sessions pick up the new account's token
+  within about 30 seconds (their `/status` keeps the old name until
+  restarted), and cma never touches your transcripts in
+  `~/.claude/projects/`, so earlier conversations stay available to
+  `claude --resume`.
+- **Claude Desktop:** cma swaps Desktop's login without logging out (a
+  logout would revoke it), so every account keeps its own sidebar and
+  sessions. Turn on session follow (`cma config set session_follow on`, or
+  the menubar toggle) and a Desktop switch also moves your local Code and
+  Cowork sessions to the new account's sidebar, where they resume from
+  their local transcripts.
+
+Chats stored on claude.ai stay with the account that owns them; cma moves
+only what lives on your Mac. Details:
+[session follow](docs/usage.md#session-follow-desktop-only).
 
 ## Install
 
