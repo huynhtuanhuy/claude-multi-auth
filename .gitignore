@@ -23,3 +23,12 @@ __pycache__/
 .idea/
 .vscode/
 
+
+# npm package: the release workflow places these
+/npm/bin/
+/npm/checksums.json
+/npm/*.tgz
+/dist/
+
+# Local agent state
+/.claude/
