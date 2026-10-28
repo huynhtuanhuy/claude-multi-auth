@@ -1,7 +1,7 @@
 # Architecture
 
 How claude-multi-auth is put together, for people changing it. What each
-command does for a user is in the [README](../README.md); the `--json`
+command does for a user is in [usage.md](usage.md); the `--json`
 contract is in [json-api.md](json-api.md). The module docs at the top of each
 file in `crates/core/src/` are the detailed, authoritative description; this
 page is the map.

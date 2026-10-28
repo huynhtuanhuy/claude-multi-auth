@@ -402,7 +402,7 @@ impl<R: CommandRunner> SecurityCliStore<R> {
         } else {
             drop(line);
             // Over the `security -i` line limit: argv form, as Claude Code does.
-            // The hex is briefly visible in `ps` (documented in the README).
+            // The hex is briefly visible in `ps` (documented in docs/security.md).
             let hex = hex_zeroizing(value.expose());
             let args: Vec<OsString> = vec![
                 "add-generic-password".into(),

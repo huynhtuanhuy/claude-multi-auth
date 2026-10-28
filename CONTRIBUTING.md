@@ -43,7 +43,12 @@ cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 npm --prefix app run build
+node scripts/check-versions.mjs          # every version file agrees
+npm --prefix npm test                    # the npm installer
+node --test scripts/test/*.test.mjs      # the release scripts
 ```
+
+How releases are built and published is in [docs/release.md](docs/release.md).
 
 ## Tests never touch your real state
 
@@ -67,8 +72,8 @@ npm --prefix app run build
   test or fixture.
 - Tests that need the real Keychain are `#[ignore]` and use only the service
   `claude-multi-auth-test`. Run them deliberately with
-  `cargo test -p cma-core -- --ignored keychain`. The README's
-  [Uninstall](README.md#uninstall) section shows how to delete leftover test
+  `cargo test -p cma-core -- --ignored keychain`. The
+  [Uninstall](docs/install.md#uninstall) steps shows how to delete leftover test
   items.
 
 ## Changes that need extra care
@@ -77,8 +82,8 @@ npm --prefix app run build
   Claude Desktop's files): go through the backup and journal, read the
   write back, and keep the lock order in `crates/core/src/lock.rs`.
 - **Secrets**: never in a file, a log, an error message, command output or
-  a command line, except where the README's
-  [Security notes](README.md#security-notes) say so.
+  a command line, except where the
+  [security notes](docs/security.md#security-notes) say so.
 - **The `--json` contract**: changes within `schema_version` 1 are additive
   only. Update [docs/json-api.md](docs/json-api.md) in the same change.
 - **Claude Desktop data**: what counts as Desktop's login and where it keeps

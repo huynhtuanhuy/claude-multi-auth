@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project uses [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - unreleased
+## [0.1.0] - 2026-10-28
 
 First release.
 
@@ -31,3 +31,11 @@ First release.
   switch Claude Code and Claude Desktop per account, link Desktop, add
   accounts, toggle session follow, view backups and settings, install the
   CLI, and launch at login.
+- Releases with universal (Apple silicon and Intel) builds: the app as
+  `.dmg` and `.app.zip`, `cma` as a tarball, `SHA256SUMS`, and GitHub build
+  attestations.
+- npm package `claude-multi-auth` with an installer
+  (`npx claude-multi-auth`): install the command line tool, the menubar app,
+  or both (`--cli`, `--app`, `--all`), and uninstall them (`--uninstall`).
+  The app is downloaded from the GitHub Release of the same version and
+  checked against a SHA-256 shipped in the package.

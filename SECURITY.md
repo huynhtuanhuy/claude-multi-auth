@@ -19,10 +19,11 @@ In scope:
 
 - a token, refresh token or credential written to a file, a log, command
   output (human or `--json`), an error message, or a command line, beyond
-  what the README's [Security notes](README.md#security-notes) document;
+  what the [security notes](docs/security.md#security-notes) document;
 - a way to make cma lose a login, overwrite a newer login with an older
   one, or write outside the locations it documents;
-- tokens sent anywhere other than the Anthropic endpoints the README lists,
+- tokens sent anywhere other than the Anthropic endpoints listed under
+  [Usage display](docs/usage.md#usage-display-opt-in),
   or over anything but HTTPS;
 - the menubar app's webview or command surface running something it should
   not.
@@ -54,6 +55,6 @@ Where secrets are kept:
 
 Everything else under `~/.claude-multi-auth` is non-secret metadata. The
 full notes, including the `ps` exposure and the network endpoints, are in
-the README: [Security notes](README.md#security-notes),
-[Usage display](README.md#usage-display-opt-in) and
-[Known limits](README.md#known-limits).
+[Security notes](docs/security.md#security-notes),
+[Usage display](docs/usage.md#usage-display-opt-in) and
+[Known limits](docs/security.md#known-limits).
