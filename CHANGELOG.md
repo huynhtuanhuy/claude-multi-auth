@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-10-28
+
+### Fixed
+
+- The release workflow now publishes the npm package (it passed the tarball
+  path in a form npm read as a GitHub repository).
+
 ## [0.1.0] - 2026-10-28
 
 First release.

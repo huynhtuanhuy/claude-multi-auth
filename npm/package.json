@@ -1,6 +1,6 @@
 {
   "name": "claude-multi-auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Keep several Claude accounts logged in on one Mac and switch Claude Code and Claude Desktop between them. Installs the cma CLI and the menubar app.",
   "keywords": [
     "claude",
