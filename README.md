@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Switch Claude Code and Claude Desktop between several Claude accounts on one
-Mac, without logging out.
+Mac, without logging out. Linux and Windows support is coming soon.
 
 <!-- demo: add docs/assets/demo.gif (menubar + `cma list`) -->
 
@@ -60,8 +60,13 @@ only what lives on your Mac. Details:
 
 ## Install
 
-macOS 13 or later, Apple silicon or Intel. Claude Code must have been run and
-logged in at least once.
+| Platform | Command line | Menubar app | Claude Desktop switching |
+|----------|:------------:|:-----------:|:------------------------:|
+| macOS 13+ (Apple silicon and Intel) | ✅ | ✅ | ✅ |
+| Linux | 🚧 coming soon | 🚧 coming soon | — |
+| Windows | 🚧 coming soon | 🚧 coming soon | 🚧 coming soon |
+
+Claude Code must have been run and logged in at least once.
 
 | You want | Run |
 |----------|-----|
