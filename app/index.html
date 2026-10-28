@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude Multi Auth</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <nav class="tabs" role="tablist">
+        <button type="button" role="tab" data-view="accounts">Accounts</button>
+        <button type="button" role="tab" data-view="settings">Settings</button>
+        <button type="button" role="tab" data-view="backups">Backups</button>
+      </nav>
+    </header>
+    <div id="banner" class="banner" hidden></div>
+    <main id="view"></main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

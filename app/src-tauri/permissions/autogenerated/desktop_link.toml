@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-desktop-link"
+description = "Enables the desktop_link command without any pre-configured scope."
+commands.allow = ["desktop_link"]
+
+[[permission]]
+identifier = "deny-desktop-link"
+description = "Denies the desktop_link command without any pre-configured scope."
+commands.deny = ["desktop_link"]

@@ -1,0 +1,48 @@
+[package]
+name = "cma"
+description = "Switch Claude Code and Claude Desktop between multiple accounts."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+name = "cma"
+path = "src/lib.rs"
+doctest = false
+
+[[bin]]
+name = "cma"
+path = "src/main.rs"
+doc = false
+
+[features]
+# File-backed fake Keychain, profile/usage endpoints, process list and
+# `claude auth login`, selected with CMA_SECRET_BACKEND=fake. For this
+# crate's integration tests only (enabled through the dev-dependency on
+# itself below); a release build refuses to compile with it.
+test-backends = ["dep:nix"]
+
+[dependencies]
+cma-core.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+dialoguer = { version = "0.12.0", default-features = false }
+ratatui = { version = "0.30.2", default-features = false, features = ["crossterm"] }
+# O_NOFOLLOW and getuid() for `login --args-file` (already in the tree
+# through cma-core).
+rustix = { version = "1.1.4", features = ["process", "fs"] }
+# Passwd home lookup for the test backend's isolation check (no unsafe here).
+nix = { version = "0.31.3", default-features = false, features = ["user"], optional = true }
+
+[dev-dependencies]
+cma = { path = ".", features = ["test-backends"] }
+nix = { version = "0.31.3", default-features = false, features = ["user"] }
+assert_cmd.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

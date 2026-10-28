@@ -1,0 +1,25 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Frontend
+node_modules/
+/app/dist/
+/app/src-tauri/binaries/
+/app/src-tauri/gen/
+# A relative CARGO_TARGET_DIR given to `tauri build` resolves from app/src-tauri.
+/app/target/
+/app/src-tauri/target/
+
+# Local working notes and experiments (not part of the published project)
+/plans/
+/spike/
+__pycache__/
+*.pyc
+
+# OS / editors
+.DS_Store
+*.swp
+.idea/
+.vscode/
+

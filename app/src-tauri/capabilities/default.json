@@ -1,0 +1,22 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The settings window may call only the app's own commands; plugins are driven from Rust.",
+  "windows": ["settings"],
+  "permissions": [
+    "allow-get-state",
+    "allow-poll",
+    "allow-switch",
+    "allow-remove",
+    "allow-set-alias",
+    "allow-set-setting",
+    "allow-refresh-usage",
+    "allow-list-backups",
+    "allow-restore",
+    "allow-resolve-journal",
+    "allow-install-cli",
+    "allow-start-login",
+    "allow-desktop-link",
+    "allow-set-launch-at-login"
+  ]
+}

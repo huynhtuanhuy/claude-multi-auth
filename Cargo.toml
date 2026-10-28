@@ -1,0 +1,41 @@
+[workspace]
+resolver = "3"
+members = ["crates/core", "crates/cli", "app/src-tauri"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+license = "MIT"
+repository = "https://github.com/huynhtuanhuy/claude-multi-auth"
+publish = false
+
+# Keychain access goes through /usr/bin/security, so no security-framework/keyring crates.
+[workspace.dependencies]
+cma-core = { path = "crates/core" }
+clap = { version = "4.6.7", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0.154"
+thiserror = "2.0.21"
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "time"] }
+reqwest = { version = "0.13.5", features = ["json"] }
+tempfile = "3.27.0"
+dirs = "7.0.0"
+assert_cmd = "2.2.2"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = "thin"
+strip = true
+
+# Never strip proc-macro and build-script dylibs: with MACOSX_DEPLOYMENT_TARGET
+# set (the Tauri bundler sets it from bundle.macOS.minimumSystemVersion), a
+# stripped proc-macro dylib fails to load ("mis-aligned LINKEDIT string
+# pool") and the release build of the app breaks. Final binaries stay stripped.
+[profile.release.build-override]
+strip = false

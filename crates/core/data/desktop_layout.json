@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "desktop_version_tested": "4.29.0",
+  "patterns": [
+    {
+      "root": "claude-code-sessions",
+      "order": "<acct>/<org>",
+      "movable": true,
+      "keep": ["scheduled-tasks.json", "archived-sessions.idx", "backlog", "waiting-input"]
+    },
+    {
+      "root": "local-agent-mode-sessions",
+      "order": "<acct>/<org>",
+      "movable": true,
+      "keep": ["rpm", "scheduled-tasks.json"]
+    },
+    {
+      "root": "scratch-workspaces",
+      "order": "<acct>/<org>",
+      "movable": true,
+      "keep": []
+    },
+    {
+      "root": "local-agent-mode-sessions/skills-plugin",
+      "order": "<org>/<acct>",
+      "movable": false,
+      "reason": "the account's installed skills plugin (manifest.json, skills/), not sessions; every entry would collide with the other account's copy"
+    },
+    {
+      "root": "spaces-present",
+      "order": "<acct8>/<org8>",
+      "movable": false,
+      "reason": "holds a single per-account link-key, not sessions"
+    }
+  ]
+}

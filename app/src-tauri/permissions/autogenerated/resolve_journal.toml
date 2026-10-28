@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-resolve-journal"
+description = "Enables the resolve_journal command without any pre-configured scope."
+commands.allow = ["resolve_journal"]
+
+[[permission]]
+identifier = "deny-resolve-journal"
+description = "Denies the resolve_journal command without any pre-configured scope."
+commands.deny = ["resolve_journal"]

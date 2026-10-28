@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "desktop_version_tested": "4.29.0",
+  "source": "local swap experiment: every unit and key below was moved aside, the other account signed in, and swapping the sets back and forth showed each account without a login",
+  "account_key": "lastKnownAccountUuid",
+  "config_keys": [
+    {"kind": "exact", "key": "lastKnownAccountUuid"},
+    {"kind": "prefix", "key": "oauth:"},
+    {"kind": "exact", "key": "bootSideSessions"},
+    {"kind": "exact", "key": "bootSidebarPlaceholder"},
+    {"kind": "uuid_suffix", "key": "dxt:allowlistCache:"},
+    {"kind": "uuid_suffix", "key": "dxt:allowlistLastUpdated:"}
+  ],
+  "paths": [
+    "Cookies",
+    "DIPS",
+    "IndexedDB/https_claude.ai_0.indexeddb.blob",
+    "IndexedDB/https_claude.ai_0.indexeddb.leveldb",
+    "Local Storage",
+    "Network Persistent State",
+    "Partitions/launch-preview-cowork-shared/DIPS",
+    "Partitions/launch-preview-cowork-shared/Local Storage",
+    "Partitions/launch-preview-cowork-shared/Network Persistent State",
+    "Partitions/launch-preview-cowork-shared/Session Storage",
+    "Partitions/launch-preview-static/DIPS",
+    "Partitions/launch-preview-static/Local Storage",
+    "Partitions/launch-preview-static/Network Persistent State",
+    "Partitions/launch-preview-static/Session Storage",
+    "Session Storage",
+    "TransportSecurity",
+    "WebStorage",
+    "cowork-enabled-cli-ops.json",
+    "plan-usage-history.json"
+  ],
+  "sidecars": ["-journal", "-wal", "-shm"],
+  "secret_files": ["config.json.journal"],
+  "exclude": [
+    "ant-device-registry.json",
+    "claude_desktop_config.json",
+    "git-worktrees.json",
+    "window-state.json"
+  ]
+}

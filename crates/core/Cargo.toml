@@ -1,0 +1,47 @@
+[package]
+name = "cma-core"
+description = "Core logic for claude-multi-auth: profiles, secret store, switch, usage."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+# Not `core`: that name would shadow the built-in `core` crate.
+name = "cma_core"
+
+[dependencies]
+serde.workspace = true
+# preserve_order: credential fingerprints hash `claudeAiOauth` with its keys in
+# stored order, and registry unknown fields round-trip in their original order.
+# raw_value: the live credential item is edited key-by-key so every other
+# top-level key (`mcpOAuth`, …) keeps its exact bytes.
+serde_json = { workspace = true, features = ["preserve_order", "raw_value"] }
+thiserror.workspace = true
+tempfile.workspace = true
+dirs.workspace = true
+sha2 = "0.10.9"
+hex = "0.4.3"
+time = { version = "0.3.54", features = ["formatting", "macros"] }
+zeroize = { version = "1.9.0", features = ["derive"] }
+regex = "1.13.1"
+# Safe getuid() and O_NOFOLLOW without `unsafe` (the workspace forbids it).
+# Already in the tree through tempfile.
+rustix = { version = "1.1.4", features = ["process", "fs"] }
+# SIGINT during the isolated `claude auth login`: set a flag so the cleanup
+# guard runs (a second Ctrl-C terminates).
+signal-hook = "0.3.18"
+# OAuth usage/token/profile requests. Declared here instead of through the
+# workspace entry because default features must be off: rustls with the
+# `ring` provider (no aws-lc-rs, so no cmake), blocking API (its own tokio
+# runtime), no cookies/compression.
+reqwest = { version = "0.13.5", default-features = false, features = ["blocking", "rustls-no-provider", "http2", "system-proxy"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
+[dev-dependencies]
+proptest = "1"
+
+[lints]
+workspace = true
